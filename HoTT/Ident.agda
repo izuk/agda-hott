@@ -21,6 +21,8 @@ x ≡ y = Id _ x y
   → (y : X) → (p : x ≡ y) → B y p
 ℍ x B b x (refl x) = b
 
+-- Defining `𝕁` in terms of `ℍ`.
+
 𝕁' : {X : Set}
   → (A : (x y : X) → x ≡ y → Set)
   → ((x : X) → A x x (refl x))
@@ -29,17 +31,11 @@ x ≡ y = Id _ x y
 
 -- Defining `ℍ` in terms of `𝕁`.
 
-id : {X : Set} → X → X
-id x = x
-
 transport : {X : Set} → (f : X → Set) → (x y : X) → (x ≡ y) → f x → f y
-transport f = 𝕁 (λ x y p → f x → f y) (λ x → id)
+transport f = 𝕁 (λ x y p → f x → f y) (λ x y → y)
 
 data Σ (A : Set) (p : A → Set) : Set  where
   _,_ : (x : A) → p x → Σ A p
-
-_×_ : (A B : Set) → Set
-A × B = Σ A (λ _ → B)
 
 curry : {A : Set} {B : A → Set} → ((x : A) → B x → Set) → Σ A B → Set
 curry f (x , y) = f x y
@@ -48,7 +44,8 @@ curry f (x , y) = f x y
 singl : (A : Set) → A → Set
 singl A x = Σ A (λ y → x ≡ y)
 
--- Note:  `≡` in the conclusion is WRT `Id (singl X x)`.
+-- Note: `≡` in the conclusion is WRT `Id (singl X x)`.
+-- Source: http://www.cse.chalmers.se/~coquand/singl.pdf
 lemma : {X : Set} → (x y : X) → (p : x ≡ y) → (x , refl x) ≡ (y , p)
 lemma = 𝕁 (λ x y p → (x , refl x) ≡ (y , p)) (λ x → refl (x , refl x))
 
